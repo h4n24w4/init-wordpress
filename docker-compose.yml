@@ -1,0 +1,29 @@
+version: '3'
+services:
+    database:
+        image: mysql:5.7
+        command:
+            - "--character-set-server=utf8"
+            - "--collation-server=utf8_unicode_ci"
+        ports:
+            - "3306:3306"
+        restart: on-failure:5
+        container_name: "${PRD_NAME}_db"
+        environment:
+            MYSQL_USER: "{MYSQL_USER}"
+            MYSQL_DATABASE: "{MYSQL_DB}"
+            MYSQL_PASSWORD: "{MYSQL_PASSWORD}"
+            MYSQL_ROOT_PASSWORD: "{MYSQL_PASSWORD}"
+    wordpress:
+        depends_on:
+            - database
+        image: wordpress:latest
+        container_name: "${PRD_NAME}_wordpress"
+        ports:
+            - "${SERVER_PORT}:80"
+        restart: on-failure:5
+        volumes:
+            - ./public:/var/www/html
+        environment:
+            WORDPRESS_DB_HOST: database:3306
+            WORDPRESS_DB_PASSWORD: "{MYSQL_PASSWORD}"
